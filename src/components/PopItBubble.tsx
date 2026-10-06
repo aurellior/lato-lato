@@ -1,29 +1,30 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { popAudio } from '@/lib/audio';
 
 interface PopItBubbleProps {
   id: string;
-  colIndex: number;
-  onPop: (colIndex: number, id: string) => void;
+  popped: boolean;
+  onPop: (id: string) => void;
   size?: number;
 }
 
-export default function PopItBubble({ id, colIndex, onPop, size = 60 }: PopItBubbleProps) {
+export default function PopItBubble({ id, popped, onPop, size = 60 }: PopItBubbleProps) {
   const handleInteract = (e: React.MouseEvent | React.TouchEvent) => {
-    if (popAudio) {
-      popAudio.init();
-      popAudio.resume();
-      const pitchShift = 1.0 + Math.random() * 0.5; // sharper pitch
-      popAudio.playPopSound(pitchShift);
+    if (!popped) {
+      if (popAudio) {
+        popAudio.init();
+        popAudio.resume();
+        const pitchShift = 1.0 + Math.random() * 0.5; // sharper pitch for plastic
+        popAudio.playPopSound(pitchShift);
+      }
+      
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(15);
+      }
+      onPop(id);
     }
-    
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate(15);
-    }
-    onPop(colIndex, id);
   };
 
   const handlePointerOver = (e: React.PointerEvent) => {
@@ -33,45 +34,43 @@ export default function PopItBubble({ id, colIndex, onPop, size = 60 }: PopItBub
   };
 
   return (
-    <motion.div
-      layout
-      initial={{ scale: 0.5, opacity: 0, y: -50 }}
-      animate={{ scale: 1, opacity: 1, y: 0 }}
-      exit={{ scale: 1.5, opacity: 0, filter: 'blur(10px)' }} // soap burst effect
-      transition={{ 
-        type: 'spring', 
-        stiffness: 300, 
-        damping: 20,
-        layout: { type: 'spring', stiffness: 200, damping: 25 } // smooth falling
-      }}
-      className={`relative rounded-full cursor-pointer touch-none select-none flex items-center justify-center`}
+    <div
+      className={`relative rounded-full cursor-pointer touch-none select-none transition-all duration-75 flex items-center justify-center`}
       style={{
         width: size,
         height: size,
+        // Base plastic look
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         backdropFilter: 'blur(4px)',
-        border: '1px solid rgba(255, 255, 255, 0.4)',
-        boxShadow: `2px 2px 8px rgba(0,0,0,0.15), inset 4px 4px 15px rgba(255,255,255,0.7), inset -4px -4px 15px rgba(0,0,0,0.1)`,
+        border: popped ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.4)',
+        boxShadow: popped 
+          ? `inset 1px 1px 10px rgba(0,0,0,0.1), inset -1px -1px 5px rgba(255,255,255,0.05)`
+          : `2px 2px 8px rgba(0,0,0,0.15), inset 4px 4px 15px rgba(255,255,255,0.7), inset -4px -4px 15px rgba(0,0,0,0.1)`,
       }}
       onPointerDown={handleInteract}
       onPointerEnter={handlePointerOver}
     >
-      {/* Glossy reflection */}
+      {/* Glossy reflection that disappears when popped */}
       <div 
-        className="absolute top-2 left-2 rounded-full opacity-80"
+        className="absolute top-2 left-2 rounded-full transition-opacity duration-75"
         style={{
           width: '30%',
           height: '25%',
           background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0))',
           transform: 'rotate(-45deg)',
+          opacity: popped ? 0.1 : 0.8
         }}
       />
+      
+      {/* Inner shadow / dimension */}
       <div 
         className="rounded-full w-full h-full absolute top-0 left-0"
         style={{
-          background: 'radial-gradient(circle at center, rgba(255,255,255,0) 40%, rgba(255,255,255,0.2) 100%)',
+          background: popped 
+            ? 'radial-gradient(circle at center, rgba(0,0,0,0.05) 0%, rgba(255,255,255,0.1) 100%)'
+            : 'radial-gradient(circle at center, rgba(255,255,255,0) 40%, rgba(255,255,255,0.2) 100%)',
         }}
       />
-    </motion.div>
+    </div>
   );
 }
