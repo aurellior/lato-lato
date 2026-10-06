@@ -13,10 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Lato-Lato Online: Simulasi Interaktif & Sensor Gyro",
-  description: "Mainkan simulasi permainan tradisional Lato-Lato di HP dan desktop dengan kontrol sensor gerak Gyroscope, Touch Drag, audio clack realistis, dan dynamic neon themes.",
-  keywords: ["lato-lato", "clackers", "game lato lato", "gyroscope game", "nextjs", "web audio"],
-  authors: [{ name: "Lato-Lato Master" }],
+  title: "Bubble Keberuntungan",
+  description: "Mainkan mini-game Bubble Keberuntungan. Cari 1 gelembung rahasia dari 60 gelembung sebelum nyawa habis!",
+  keywords: ["bubble wrap", "game gelembung", "bubble keberuntungan", "mini game"],
+  authors: [{ name: "Bubble Keberuntungan" }],
 };
 
 export const viewport: Viewport = {
