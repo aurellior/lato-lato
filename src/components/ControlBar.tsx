@@ -45,102 +45,96 @@ export default function ControlBar({
   onResetScore,
 }: ControlBarProps) {
   return (
-    <div className="w-full max-w-xl mx-auto px-4 pb-4 pt-1 z-20 flex flex-col gap-2.5">
-      {/* Primary Control Switcher: Gyro Mode vs Touch / Mouse Drag */}
-      <div className="bg-slate-900/80 border border-slate-800/90 backdrop-blur-md rounded-2xl p-1.5 flex items-center gap-1 shadow-xl">
+    <div className="w-full max-w-lg mx-auto px-4 pb-4 pt-1 z-20 flex flex-col gap-2">
+      {/* Primary Switcher */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-1 flex items-center gap-1">
         <button
           onClick={() => onToggleMode(true)}
-          className={`flex-1 py-2 sm:py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium flex items-center justify-center gap-2 cursor-pointer ${
             isGyroMode
-              ? 'bg-gradient-to-r from-pink-500 to-indigo-600 text-white shadow-md'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+              ? 'bg-pink-600 text-white'
+              : 'text-slate-400 hover:text-white'
           }`}
         >
-          <Smartphone className="w-4 h-4" />
-          <span>Mode Gyro / Gerak</span>
+          <Smartphone className="w-3.5 h-3.5" />
+          <span>Gyro</span>
         </button>
 
         <button
           onClick={() => onToggleMode(false)}
-          className={`flex-1 py-2 sm:py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium flex items-center justify-center gap-2 cursor-pointer ${
             !isGyroMode
-              ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+              ? 'bg-blue-600 text-white'
+              : 'text-slate-400 hover:text-white'
           }`}
         >
-          <MousePointer className="w-4 h-4" />
-          <span>Mode Drag / Sentuh</span>
+          <MousePointer className="w-3.5 h-3.5" />
+          <span>Drag / Sentuh</span>
         </button>
       </div>
 
-      {/* Auxiliary Actions & Utilities */}
-      <div className="flex items-center justify-between gap-1.5 sm:gap-2">
-        {/* Auto Rhythm Assist Button */}
+      {/* Action Buttons */}
+      <div className="flex items-center justify-between gap-1.5">
         <button
           onClick={onToggleAutoSwing}
-          className={`py-2 px-3 rounded-xl text-xs font-medium flex items-center gap-1.5 border transition cursor-pointer backdrop-blur-md shadow-sm ${
+          className={`py-1.5 px-2.5 rounded-lg text-xs border cursor-pointer flex items-center gap-1.5 ${
             autoSwingEnabled
-              ? 'bg-amber-500/20 border-amber-500/60 text-amber-300'
-              : 'bg-slate-900/70 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/80'
+              ? 'bg-amber-600 border-amber-500 text-white'
+              : 'bg-slate-900 border-slate-800 text-slate-300 hover:text-white'
           }`}
-          title="Mode Latihan Ritme Otomatis"
+          title="Auto Ritme"
         >
-          {autoSwingEnabled ? <Pause className="w-3.5 h-3.5 text-amber-400" /> : <Play className="w-3.5 h-3.5 text-emerald-400" />}
-          <span className="hidden xs:inline">Auto Ritme</span>
+          {autoSwingEnabled ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+          <span>Auto</span>
         </button>
 
-        {/* Theme Picker Button */}
         <button
           onClick={onOpenThemeModal}
-          className="py-2 px-3 rounded-xl text-xs font-medium bg-slate-900/70 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80 transition flex items-center gap-1.5 cursor-pointer backdrop-blur-md shadow-sm"
-          title="Ganti Tema Warna"
+          className="py-1.5 px-2.5 rounded-lg text-xs bg-slate-900 border border-slate-800 text-slate-300 hover:text-white cursor-pointer flex items-center gap-1.5"
+          title="Tema"
         >
-          <Palette className="w-3.5 h-3.5" style={{ color: theme.accentColor }} />
-          <span className="hidden sm:inline">Tema</span>
+          <Palette className="w-3 h-3" style={{ color: theme.ball1.color }} />
+          <span>Tema</span>
         </button>
 
-        {/* Sound Toggle */}
         <button
           onClick={onToggleMute}
-          className={`p-2 sm:px-3 rounded-xl text-xs font-medium border transition cursor-pointer backdrop-blur-md shadow-sm flex items-center gap-1.5 ${
+          className={`p-1.5 px-2.5 rounded-lg text-xs border cursor-pointer ${
             isMuted
-              ? 'bg-rose-500/20 border-rose-500/50 text-rose-300'
-              : 'bg-slate-900/70 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80'
+              ? 'bg-rose-900/40 border-rose-800 text-rose-300'
+              : 'bg-slate-900 border-slate-800 text-slate-300 hover:text-white'
           }`}
-          title={isMuted ? 'Suara Dimatikan' : 'Suara Aktif'}
+          title="Suara"
         >
-          {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-cyan-400" />}
+          {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
         </button>
 
-        {/* Haptic Toggle */}
         <button
           onClick={onToggleHaptic}
-          className={`p-2 sm:px-3 rounded-xl text-xs font-medium border transition cursor-pointer backdrop-blur-md shadow-sm flex items-center gap-1.5 ${
+          className={`p-1.5 px-2.5 rounded-lg text-xs border cursor-pointer ${
             hapticEnabled
-              ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300'
-              : 'bg-slate-900/70 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/80'
+              ? 'bg-cyan-900/40 border-cyan-800 text-cyan-300'
+              : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
           }`}
-          title={hapticEnabled ? 'Getar / Haptic Aktif' : 'Getar Dimatikan'}
+          title="Getar"
         >
-          <Vibrate className="w-4 h-4" />
+          <Vibrate className="w-3.5 h-3.5" />
         </button>
 
-        {/* Score Reset */}
         <button
           onClick={onResetScore}
-          className="p-2 sm:px-3 rounded-xl text-xs font-medium bg-slate-900/70 border border-slate-800 text-slate-400 hover:text-rose-400 hover:border-rose-500/40 hover:bg-slate-800/80 transition cursor-pointer backdrop-blur-md shadow-sm flex items-center gap-1"
-          title="Reset Skor"
+          className="p-1.5 px-2.5 rounded-lg text-xs bg-slate-900 border border-slate-800 text-slate-400 hover:text-rose-400 cursor-pointer"
+          title="Reset"
         >
-          <RotateCcw className="w-4 h-4" />
+          <RotateCcw className="w-3.5 h-3.5" />
         </button>
 
-        {/* Help / Guide */}
         <button
           onClick={onOpenHelpModal}
-          className="p-2 sm:px-3 rounded-xl text-xs font-medium bg-slate-900/70 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/80 transition cursor-pointer backdrop-blur-md shadow-sm flex items-center gap-1"
-          title="Panduan Bermain"
+          className="p-1.5 px-2.5 rounded-lg text-xs bg-slate-900 border border-slate-800 text-slate-300 hover:text-white cursor-pointer"
+          title="Panduan"
         >
-          <HelpCircle className="w-4 h-4 text-amber-400" />
+          <HelpCircle className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>
