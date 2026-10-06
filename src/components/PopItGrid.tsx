@@ -124,9 +124,13 @@ export default function PopItGrid() {
       
       <button 
         onClick={initGame}
-        className="px-8 py-3 bg-blue-600/90 hover:bg-blue-500 text-white font-bold rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all border border-blue-400/50 backdrop-blur-sm z-20"
+        className={`px-8 py-3 font-bold rounded-full shadow-lg transition-all border backdrop-blur-sm z-20 ${
+          gameState !== 'playing' 
+            ? 'bg-red-500 hover:bg-red-400 text-white border-red-300 animate-pulse scale-110' 
+            : 'bg-blue-600/90 hover:bg-blue-500 text-white border-blue-400/50 hover:scale-105 active:scale-95'
+        }`}
       >
-        Mulai Permainan Baru
+        {gameState !== 'playing' ? 'Retry' : 'Reset Permainan'}
       </button>
     </div>
   );
