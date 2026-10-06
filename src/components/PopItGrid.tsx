@@ -16,8 +16,23 @@ export default function PopItGrid() {
     initGame();
     
     const handleResize = () => {
-      const isMobile = window.innerWidth < 600;
-      setBubbleSize(isMobile ? 45 : 60);
+      // Calculate how much space we have (subtracting headers, padding, and UI elements)
+      const availableWidth = window.innerWidth - 40; // horizontal padding
+      const availableHeight = window.innerHeight - 220; // vertical padding for HUD, Title, etc.
+      
+      // The grid is 6 cols and 10 rows. We need the bubble to fit both width and height.
+      // Width calculation: 6 cols + 0.5 offset for honeycomb
+      const maxBubbleByWidth = availableWidth / 6.5;
+      
+      // Height calculation: 10 rows
+      const maxBubbleByHeight = availableHeight / 10;
+      
+      // Take the smallest size so it fits perfectly, subtract 8px for grid gap, 
+      // and clamp it between 30px (min) and 65px (max).
+      let calculatedSize = Math.min(maxBubbleByWidth, maxBubbleByHeight) - 8;
+      calculatedSize = Math.max(30, Math.min(calculatedSize, 65));
+      
+      setBubbleSize(calculatedSize);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
