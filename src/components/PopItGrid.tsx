@@ -54,84 +54,100 @@ export default function PopItGrid() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full">
-      
-      {/* Game Header HUD */}
-      <div className="bg-black/40 backdrop-blur-md px-8 py-4 rounded-2xl shadow-xl border border-white/20 text-center z-20">
-        {gameState === 'playing' && (
+    <>
+      {/* Full Screen Overlay Modal for Win/Lose */}
+      {gameState !== 'playing' && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-md p-4">
+          <div className="bg-gray-900 border border-gray-700 p-8 flex flex-col items-center justify-center rounded-3xl shadow-2xl animate-in fade-in zoom-in duration-300 max-w-sm w-full text-center">
+            {gameState === 'won' ? (
+              <>
+                <p className="text-4xl mb-2">🎉</p>
+                <h2 className="text-3xl font-black text-yellow-400 drop-shadow-md mb-2 animate-bounce">KAMU MENANG!</h2>
+                <p className="text-gray-300 mb-8">Kamu berhasil menemukan gelembung keberuntungan!</p>
+              </>
+            ) : (
+              <>
+                <p className="text-4xl mb-2">💀</p>
+                <h2 className="text-3xl font-black text-red-500 drop-shadow-md mb-2">GAME OVER</h2>
+                <p className="text-gray-300 mb-8">Nyawa kamu sudah habis (30/30).</p>
+              </>
+            )}
+            
+            <button 
+              onClick={initGame}
+              className="px-10 py-4 w-full bg-blue-600 hover:bg-blue-500 text-white font-black text-xl rounded-full shadow-xl hover:scale-105 active:scale-95 transition-all border border-blue-400"
+            >
+              Coba Lagi (Retry)
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col items-center gap-6 w-full">
+        
+        {/* Game Header HUD */}
+        <div className="bg-black/40 backdrop-blur-md px-8 py-4 rounded-2xl shadow-xl border border-white/20 text-center z-20">
           <p className="text-xl font-bold text-white drop-shadow-md">
             Nyawa Tersisa: <span className={lives <= 5 ? "text-red-400" : "text-green-400"}>{lives}</span>
           </p>
-        )}
-        {gameState === 'won' && (
-          <p className="text-2xl font-black text-yellow-400 animate-bounce">
-            🎉 KAMU MENANG! 🎉
-          </p>
-        )}
-        {gameState === 'lost' && (
-          <p className="text-2xl font-black text-red-500">
-            💀 GAME OVER 💀
-          </p>
-        )}
-      </div>
-
-      <div 
-        className="p-4 rounded-xl shadow-2xl relative overflow-hidden transition-all"
-        style={{ 
-          backgroundColor: gameState === 'won' ? 'rgba(255, 215, 0, 0.2)' : gameState === 'lost' ? 'rgba(255, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.2)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255,255,255,0.4)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-          opacity: gameState === 'lost' ? 0.7 : 1
-        }}
-      >
-        <div className="absolute inset-0 pointer-events-none opacity-20 bg-[url('https://www.transparenttextures.com/patterns/crissxcross.png')]"></div>
+        </div>
 
         <div 
-          className="grid gap-2 relative z-10"
+          className="p-4 rounded-xl shadow-2xl relative overflow-hidden transition-all"
           style={{ 
-            gridTemplateColumns: `repeat(${gridSize.cols}, minmax(0, 1fr))` 
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.4)',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
           }}
         >
-          {Array.from({ length: gridSize.rows }).map((_, rowIndex) => (
-            Array.from({ length: gridSize.cols }).map((_, colIndex) => {
-              const isOddRow = rowIndex % 2 !== 0;
-              const id = `${rowIndex}-${colIndex}`;
-              const offset = bubbleSize / 2;
-              
-              return (
-                <div 
-                  key={id} 
-                  style={{ 
-                    transform: isOddRow ? `translateX(${offset}px)` : 'none',
-                    marginRight: isOddRow && colIndex === gridSize.cols - 1 ? `${offset}px` : '0'
-                  }}
-                >
-                  <PopItBubble
-                    id={id}
-                    popped={!!poppedState[id]}
-                    isWinner={id === winningId}
-                    gameState={gameState}
-                    onPop={handlePop}
-                    size={bubbleSize}
-                  />
-                </div>
-              );
-            })
-          ))}
+          <div className="absolute inset-0 pointer-events-none opacity-20 bg-[url('https://www.transparenttextures.com/patterns/crissxcross.png')]"></div>
+
+          <div 
+            className="grid gap-2 relative z-10"
+            style={{ 
+              gridTemplateColumns: `repeat(${gridSize.cols}, minmax(0, 1fr))` 
+            }}
+          >
+            {Array.from({ length: gridSize.rows }).map((_, rowIndex) => (
+              Array.from({ length: gridSize.cols }).map((_, colIndex) => {
+                const isOddRow = rowIndex % 2 !== 0;
+                const id = `${rowIndex}-${colIndex}`;
+                const offset = bubbleSize / 2;
+                
+                return (
+                  <div 
+                    key={id} 
+                    style={{ 
+                      transform: isOddRow ? `translateX(${offset}px)` : 'none',
+                      marginRight: isOddRow && colIndex === gridSize.cols - 1 ? `${offset}px` : '0'
+                    }}
+                  >
+                    <PopItBubble
+                      id={id}
+                      popped={!!poppedState[id]}
+                      isWinner={id === winningId}
+                      gameState={gameState}
+                      onPop={handlePop}
+                      size={bubbleSize}
+                    />
+                  </div>
+                );
+              })
+            ))}
+          </div>
         </div>
+        
+        {/* Only show Reset button when playing normally, hide behind modal if game is over */}
+        {gameState === 'playing' && (
+          <button 
+            onClick={initGame}
+            className="px-8 py-3 bg-gray-800/80 hover:bg-gray-700 text-gray-200 font-semibold text-sm rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all border border-gray-600 backdrop-blur-sm z-20"
+          >
+            Reset Permainan
+          </button>
+        )}
       </div>
-      
-      <button 
-        onClick={initGame}
-        className={`px-8 py-3 font-bold rounded-full shadow-lg transition-all border backdrop-blur-sm z-20 ${
-          gameState !== 'playing' 
-            ? 'bg-red-500 hover:bg-red-400 text-white border-red-300 animate-pulse scale-110' 
-            : 'bg-blue-600/90 hover:bg-blue-500 text-white border-blue-400/50 hover:scale-105 active:scale-95'
-        }`}
-      >
-        {gameState !== 'playing' ? 'Retry' : 'Reset Permainan'}
-      </button>
-    </div>
+    </>
   );
 }
