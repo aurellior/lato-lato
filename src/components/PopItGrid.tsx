@@ -6,17 +6,21 @@ import PopItBubble from './PopItBubble';
 export default function PopItGrid() {
   const [poppedState, setPoppedState] = useState<Record<string, boolean>>({});
   const [gridSize, setGridSize] = useState({ rows: 10, cols: 10 });
-  const bubbleSize = 60; // Fixed bubble size
+  const [bubbleSize, setBubbleSize] = useState(60);
 
   // Calculate grid size based on window size
   useEffect(() => {
     const calculateGrid = () => {
-      // Leave some padding
-      const width = window.innerWidth - 40;
-      const height = window.innerHeight - 150; // Leave space for header/button
+      const isMobile = window.innerWidth < 600;
+      const newBubbleSize = isMobile ? 45 : 60;
+      setBubbleSize(newBubbleSize);
+
+      // Leave padding depending on device
+      const width = window.innerWidth - (isMobile ? 20 : 40);
+      const height = window.innerHeight - (isMobile ? 180 : 150); 
       
-      const cols = Math.floor(width / (bubbleSize + 8)); // +8 for gap
-      const rows = Math.floor(height / (bubbleSize + 8));
+      const cols = Math.floor(width / (newBubbleSize + 8)); 
+      const rows = Math.floor(height / (newBubbleSize + 8));
       
       setGridSize({ rows: Math.max(3, rows), cols: Math.max(3, cols) });
     };
@@ -63,13 +67,14 @@ export default function PopItGrid() {
               // Offset odd rows for a honeycomb packing pattern (like real bubble wrap)
               const isOddRow = rowIndex % 2 !== 0;
               const id = `${rowIndex}-${colIndex}`;
+              const offset = bubbleSize / 2;
               
               return (
                 <div 
                   key={id} 
                   style={{ 
-                    transform: isOddRow ? 'translateX(30px)' : 'none',
-                    marginRight: isOddRow && colIndex === gridSize.cols - 1 ? '30px' : '0'
+                    transform: isOddRow ? `translateX(${offset}px)` : 'none',
+                    marginRight: isOddRow && colIndex === gridSize.cols - 1 ? `${offset}px` : '0'
                   }}
                 >
                   <PopItBubble
