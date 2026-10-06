@@ -5,55 +5,86 @@ import PopItBubble from './PopItBubble';
 
 export default function PopItGrid() {
   const [poppedState, setPoppedState] = useState<Record<string, boolean>>({});
-  const [gridSize, setGridSize] = useState({ rows: 10, cols: 10 });
+  const [winningId, setWinningId] = useState<string>('');
+  const [lives, setLives] = useState(30);
+  const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing');
   const [bubbleSize, setBubbleSize] = useState(60);
 
-  // Calculate grid size based on window size
+  const gridSize = { rows: 10, cols: 6 }; // Exactly 60 bubbles
+
   useEffect(() => {
-    const calculateGrid = () => {
+    initGame();
+    
+    const handleResize = () => {
       const isMobile = window.innerWidth < 600;
-      const newBubbleSize = isMobile ? 45 : 60;
-      setBubbleSize(newBubbleSize);
-
-      // Leave padding depending on device
-      const width = window.innerWidth - (isMobile ? 20 : 40);
-      const height = window.innerHeight - (isMobile ? 180 : 150); 
-      
-      const cols = Math.floor(width / (newBubbleSize + 8)); 
-      const rows = Math.floor(height / (newBubbleSize + 8));
-      
-      setGridSize({ rows: Math.max(3, rows), cols: Math.max(3, cols) });
+      setBubbleSize(isMobile ? 45 : 60);
     };
-
-    calculateGrid();
-    window.addEventListener('resize', calculateGrid);
-    return () => window.removeEventListener('resize', calculateGrid);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handlePop = (id: string) => {
-    setPoppedState(prev => ({ ...prev, [id]: true }));
+  const initGame = () => {
+    setPoppedState({});
+    setLives(30);
+    setGameState('playing');
+    
+    // Pick a random bubble as the winner
+    const randomRow = Math.floor(Math.random() * gridSize.rows);
+    const randomCol = Math.floor(Math.random() * gridSize.cols);
+    setWinningId(`${randomRow}-${randomCol}`);
   };
 
-  const resetAll = () => {
-    setPoppedState({});
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate([10, 30, 10]);
+  const handlePop = (id: string, isWinner: boolean) => {
+    if (gameState !== 'playing') return;
+
+    setPoppedState(prev => ({ ...prev, [id]: true }));
+
+    if (isWinner) {
+      setGameState('won');
+    } else {
+      setLives(prev => {
+        const newLives = prev - 1;
+        if (newLives <= 0) {
+          setGameState('lost');
+        }
+        return newLives;
+      });
     }
   };
 
   return (
-    <div className="flex flex-col items-center gap-8 w-full">
-      {/* Plastic wrap container */}
+    <div className="flex flex-col items-center gap-6 w-full">
+      
+      {/* Game Header HUD */}
+      <div className="bg-black/40 backdrop-blur-md px-8 py-4 rounded-2xl shadow-xl border border-white/20 text-center z-20">
+        {gameState === 'playing' && (
+          <p className="text-xl font-bold text-white drop-shadow-md">
+            Nyawa Tersisa: <span className={lives <= 5 ? "text-red-400" : "text-green-400"}>{lives}</span>
+          </p>
+        )}
+        {gameState === 'won' && (
+          <p className="text-2xl font-black text-yellow-400 animate-bounce">
+            🎉 KAMU MENANG! 🎉
+          </p>
+        )}
+        {gameState === 'lost' && (
+          <p className="text-2xl font-black text-red-500">
+            💀 GAME OVER 💀
+          </p>
+        )}
+      </div>
+
       <div 
-        className="p-4 rounded-xl shadow-2xl relative overflow-hidden"
+        className="p-4 rounded-xl shadow-2xl relative overflow-hidden transition-all"
         style={{ 
-          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          backgroundColor: gameState === 'won' ? 'rgba(255, 215, 0, 0.2)' : gameState === 'lost' ? 'rgba(255, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.2)',
           backdropFilter: 'blur(10px)',
           border: '1px solid rgba(255,255,255,0.4)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
+          boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+          opacity: gameState === 'lost' ? 0.7 : 1
         }}
       >
-        {/* Wrinkle texture overlay */}
         <div className="absolute inset-0 pointer-events-none opacity-20 bg-[url('https://www.transparenttextures.com/patterns/crissxcross.png')]"></div>
 
         <div 
@@ -64,7 +95,6 @@ export default function PopItGrid() {
         >
           {Array.from({ length: gridSize.rows }).map((_, rowIndex) => (
             Array.from({ length: gridSize.cols }).map((_, colIndex) => {
-              // Offset odd rows for a honeycomb packing pattern (like real bubble wrap)
               const isOddRow = rowIndex % 2 !== 0;
               const id = `${rowIndex}-${colIndex}`;
               const offset = bubbleSize / 2;
@@ -80,6 +110,8 @@ export default function PopItGrid() {
                   <PopItBubble
                     id={id}
                     popped={!!poppedState[id]}
+                    isWinner={id === winningId}
+                    gameState={gameState}
                     onPop={handlePop}
                     size={bubbleSize}
                   />
@@ -91,10 +123,10 @@ export default function PopItGrid() {
       </div>
       
       <button 
-        onClick={resetAll}
+        onClick={initGame}
         className="px-8 py-3 bg-blue-600/90 hover:bg-blue-500 text-white font-bold rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all border border-blue-400/50 backdrop-blur-sm z-20"
       >
-        Ganti Lembaran Baru
+        Mulai Permainan Baru
       </button>
     </div>
   );
